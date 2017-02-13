@@ -1,63 +1,40 @@
-// ===============================================================================
-// LOAD DATA
-// Linking the routes to "data" sources that hold the array friends data
-// ===============================================================================
+//this variable links our routes to data source
+var friendsData = require("../data/friends.js");
 
-var friends = require('../data/friends.js');
+// API routing
+module.exports = function(app) {
+  // API GET Requests when user clicks the link, the event listener will route to the friends file which displays friends data objects in json format
 
-module.exports = function (app) {
-  // //api path to get the friends data, responds with a json object (an array of friends). Activated on both html pages with blue API Link
-  app.get('/api/friends', function (req,res) {
-      res.json(friends);
+  app.get("/api/friends", function(req, res) {
+    res.json(friendsData);
   });
 
-  // *** Updates an array of friends "database" array and sends back the json form of the most compatible new friend
-  app.post('/api/friends', function (req, res) {
-      // newFriend is the user that filled out the survey
-      var newFriend = req.body;
+  // API POST Requests. When a user submits a form the below function is exexuted and the user's best match is evaluated
 
-      // compute best match from scores
-      var bestMatch = {};
-
-      for(var i = 0; i < newFriend.scores.length; i++) {
-        if(newFriend.scores[i] == "1 (Strongly Disagree)") {
-          newFriend.scores[i] = 1;
-        } else if(newFriend.scores[i] == "5 (Strongly Agree)") {
-          newFriend.scores[i] = 5;
-        } else {
-          newFriend.scores[i] = parseInt(newFriend.scores[i]);
-        }
+  app.post("/api/friends", function(req, res) {
+  
+      var userScore = req.body.scores;
+      var scoreArray = [];
+      var lowestScore = 0;
+      // loop throught the friendsData array, and for every score in friends data array at particluar index, store the values of score in anaother variable called tempScore
+      //calculate the difference of scores and save it in scoreArray
+      for (var i = 0; i < friendsData.length; i++){
+            var tempScore = friendsData[i].scores;
+            var totalDifference = 0;
+          // for every value of score in user's array calculate the difference between the original score (data) in friends array and add it up in a variable called totalDiff
+          for (var j = 0; j < userScore.length; j++){
+             var sum = Math.abs(parseInt(userScore[j]) - parseInt(tempScore[j]));
+             totalDifference += sum;
+          }
+          // push the value of totalDifference in score array
+          scoreArray.push(totalDifference);
       }
-      // compare the scores of newFriend with the scores of each friend in the database and find the friend with the smallest difference when each set of scores is compared
-
-      var bestMatchIndex = 0;
-      //greatest score difference for a question is 4, therefore greatest difference is 4 times # of questions in survey
-      var bestMatchDifference = 40;
-
-      for(var i = 0; i < friends.length; i++) {
-        var totalDifference = 0;
-
-        for(var index = 0; index < friends[i].scores.length; index++) {
-          var differenceOneScore = Math.abs(friends[i].scores[index] - newFriend.scores[index]);
-          totalDifference += differenceOneScore;
-        }
-
-        // if the totalDifference in scores is less than the best match so far
-        // save that index and difference
-        if (totalDifference < bestMatchDifference) {
-          bestMatchIndex = i;
-          bestMatchDifference = totalDifference;
-        }
+      // for every value in score Array, calculate the least amount of difference between the two values
+      for (var i = 0; i < scoreArray.length; i++){
+          if (scoreArray[i] < scoreArray[lowestScore]){
+            lowestScore = i;
+          }   
       }
-
-      // the best match index is used to get the best match data from the friends index
-      bestMatch = friends[bestMatchIndex];
-
-      // Put new friend from survey in "database" array
-      friends.push(newFriend);
-
-      // return the best match friend
-      res.json(bestMatch);
-  });
-
+      res.json(friendsData[lowestScore]);
+    });
 };

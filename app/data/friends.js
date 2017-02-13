@@ -1,7 +1,7 @@
 
-//will hold all of the data for new members
+//holds friends data in an array of objects to compare to new user's profile
 
-var friends = [
+var friendsArray = [
 {"name":"Jackie",
   "photo":"http://rack.1.mshcdn.com/media/ZgkyMDE2LzAxLzI4LzViL3dvcnJpZWRjYXQuNGUyM2EuanBnCnAJdGh1bWIJMTIwMHg2MjcjCmUJanBn/40fe1d67/42c/worried-cat.jpg",
   "scores":[
@@ -44,8 +44,8 @@ var friends = [
       1]}
 ];
 
-// This makes it accessible to other files using require. 
-module.exports = friends; 
+//exporting the array makes this file accessible using require
+module.exports = friendsArray; 
 
 
 

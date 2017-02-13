@@ -15,11 +15,11 @@ var path = require("path");
 // Tells node that we are creating an "express" server
 var app = express();
 
-// Sets an initial port. We"ll use this later in our listener
+// Sets an initial port for heroku as well as localhost. We"ll use this later in our listener
 var PORT = process.env.PORT || 4000;
 
 
-//makes static assets in the public folder available (style.css)
+//makes static assets in the public folder available
 app.use(express.static('app/public'));
 
 
